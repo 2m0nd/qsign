@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define PathDirBin="..\Dimond.UIQuickSignum\bin\"?>
+  <?define ProductName="'Электронная подпись файлов' версия $(var.BuildVersion)" ?>
+  <?define ProductNameInstallDir="Электронная подпись файлов" ?>
+  <?define ProductVersion="$(var.BuildVersion)" ?>
+  <?define ProductCode="*"?>
+  <?define UpgradeCode="06a81104-1e30-463d-87e1-e8a79b4c6c01"?>
+  <?define Manufacturer="2m0nd Software"?>
+  
+  <Product Id="$(var.ProductCode)" 
+           Name="$(var.ProductName)"
+           Language="1049"
+           Version="$(var.ProductVersion)" 
+           Manufacturer="$(var.Manufacturer)"
+           UpgradeCode="$(var.UpgradeCode)">
+    
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" AdminImage="yes" />
+    
+    <MajorUpgrade DowngradeErrorMessage="Более новая версия приложения [ProductName] уже установлена." />
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+    
+    <Directory DiskId="1" Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="ManufacturerDir" Name="$(var.Manufacturer)">
+          <Directory Id="INSTALLLOCATION" Name="$(var.ProductNameInstallDir)">
+            
+            <Component Id="ProductComponent" Guid="b11556a2-e066-4393-af5c-9c9210187a12">
+              <File Id="Ionic.Zip.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\Ionic.Zip.dll" />
+              <File Id="QuickSignum.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\QuickSignum.dll" />
+              <File Id="Dimond.LicenseClient.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\Dimond.LicenseClient.dll" />
+              <File Id="UIQuickSignum.exe" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\UIQuickSignum.exe" />
+              <File Id="UIQuickSignum.exe.config" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\UIQuickSignum.exe.config" />
+              <File Id="GalaSoft.MvvmLight.WPF4.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\GalaSoft.MvvmLight.WPF4.dll" />
+              <File Id="GalaSoft.MvvmLight.Extras.WPF4.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\GalaSoft.MvvmLight.Extras.WPF4.dll" />
+              <File Id="NLog.config" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\NLog.config" />
+              <File Id="NLog.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\NLog.dll" />
+              <File Id="System.Windows.Interactivity.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\System.Windows.Interactivity.dll" />
+              <File Id="Microsoft.Expression.Interactions.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\Microsoft.Expression.Interactions.dll" />
+              <File Id="Microsoft.Practices.Prism.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\Microsoft.Practices.Prism.dll" />
+              <File Id="Microsoft.Practices.Prism.Interactivity.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\Microsoft.Practices.Prism.Interactivity.dll" />
+              <File Id="Microsoft.Practices.ServiceLocation.dll" DiskId="1" Source="$(var.PathDirBin)$(var.Configuration)\Microsoft.Practices.ServiceLocation.dll" />
+            </Component>
+                       
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+
+    <Feature Id="productAllcommponents" Title="$(var.ProductName)" Level="1">
+      <!--Бинарники-->
+      <ComponentRef Id="ProductComponent" />
+      <!--Ярлыки-->
+      <ComponentRef Id="ApplicationShortcutDesktop" />
+      <ComponentRef Id="ApplicationShortcutMenu" />
+    </Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION">
+    </Property>
+
+    <UI Id="WixUI_MondoNoLicense">
+
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="Mondo" />
+
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog"  Order="999" Value="Return">1</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next"  Event="NewDialog" Value="InstallDirDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+
+      <Publish Dialog="FeaturesDlg" Control="Back" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="FeaturesDlg" Control="Install" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="FeaturesDlg" Order="1">1</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">1</Publish>
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+      <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+      <Publish Dialog="ExitDialog"
+    Control="Finish"
+    Event="DoAction"
+    Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+      
+    </UI>
+
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Запустить программу?" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1"/>
+    
+    <Property Id="WixShellExecTarget" Value="[#UIQuickSignum.exe]" />
+    
+    <CustomAction Id="LaunchApplication"
+        BinaryKey="WixCA"
+        DllEntry="WixShellExec"
+        Impersonate="yes" />
+
+    <UIRef Id="WixUI_Common" />
+
+  </Product>
+  
+  
+</Wix>

@@ -1,0 +1,152 @@
+﻿<Window x:Class="UIQuickSignum.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="_this"
+        Title="Электронная подпись файлов (бесплатная версия)" 
+        MaxHeight="900"
+        SizeToContent="WidthAndHeight"
+        MaxWidth="1000"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize" 
+        AllowDrop="True" 
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:ignor="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        ignor:Ignorable="d"
+        xmlns:viewModel="clr-namespace:UIQuickSignum.ViewModel"
+        d:DataContext="{d:DesignInstance viewModel:UiQuickSignumViewModel}"
+        DataContext="{Binding ElementName=_this, Path=UiQuickSignumViewModel}"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        xmlns:uiQuickSignum="clr-namespace:UIQuickSignum"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        FontSize="15">
+    <Window.Resources>
+        <system:Int32 x:Key="donate100">100</system:Int32>
+        <system:Int32 x:Key="donate300">300</system:Int32>
+        <system:Int32 x:Key="donate500">500</system:Int32>
+        <uiQuickSignum:BindingProxy x:Key="DataContextProxy" Data="{Binding}" />
+    </Window.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Drop">
+            <cmd:EventToCommand Command="{Binding DropCommand}" PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="10 " >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="Сертификат" />
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding CertificationList}"
+                      DisplayMemberPath="Value"
+                      SelectedValuePath="Key"
+                      SelectedValue="{Binding SelectedCertificate, Mode=TwoWay}"
+                      />
+
+            <Button Grid.Column="3" Content="Детальная информация" Command="{Binding ViewCertDitailCommand}"/>
+        </Grid>
+
+        <Grid Row="1">
+            <CheckBox 
+                Content="Подписывать файлы внутри ZIP архивов?"
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Center"
+                IsChecked="{Binding SignInZip, Mode=TwoWay}"/>
+        </Grid>
+
+        <DataGrid  Grid.Row="2" 
+                   Margin="5 20 5 20 "
+                   Name="dataGrid"
+                   AutoGenerateColumns="False"
+                   ItemsSource="{Binding FilesForSign}"
+                   SelectedItem="{Binding SelectedFileForSign, Mode=TwoWay}"
+                   Tag="{Binding ElementName=_this}"
+                   FrozenColumnCount="3"
+                   FontSize="14"
+                   EnableRowVirtualization="False"
+                   >
+            <DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}">
+                    <Setter Property="Background" Value="{Binding IsSign, Converter={StaticResource BoolToColor}}"></Setter>
+                    <EventSetter Event="Control.RequestBringIntoView" Handler="DataGrid_Documents_RequestBringIntoView"  />
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.ContextMenu>
+                <ContextMenu DataContext="{Binding PlacementTarget.SelectedItems, RelativeSource={RelativeSource Self}}">
+
+                    <MenuItem Command="{Binding Path=Data.SelectAllCommand,  Source={StaticResource DataContextProxy}}"
+                              Header="Выбрать все для подписи" CommandParameter="{Binding}"
+                              />
+
+                    <MenuItem Command="{Binding Path=Data.DeselectAllCommand,  Source={StaticResource DataContextProxy}}"
+                              Header="Исключить все для подписи" CommandParameter="{Binding}"
+                              />
+
+                    <Separator/>
+
+                    <MenuItem Command="{Binding Path=Data.CanSignCommand,  Source={StaticResource DataContextProxy}}"
+                              Header="Подписывать выбранные" CommandParameter="{Binding}"
+                              />
+
+                    <MenuItem Command="{Binding Path=Data.UnCanSignCommand,  Source={StaticResource DataContextProxy}}"
+                              Header="Не подписывать выбранные" CommandParameter="{Binding}"
+                              />
+
+                    <Separator/>
+
+                    <MenuItem Command="{Binding Path=Data.CanSignAllThisExtensionCommand,  Source={StaticResource DataContextProxy}}"
+                              Header="Подписывать файлы с таким же расширением" CommandParameter="{Binding}"
+                              />
+
+                    <MenuItem Command="{Binding Path=Data.UnCanSignAllThisExtensionCommand,  Source={StaticResource DataContextProxy}}"
+                              Header="Не подписывать файлы с таким же расширением" CommandParameter="{Binding}"
+                              />
+
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="Подписывать?" Binding="{Binding CanSign}" />
+                <DataGridTextColumn Header="Подписан?" Binding="{Binding IsSign, Converter={StaticResource BoolToWordConverter}}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Тип файла" Binding="{Binding Extension}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Путь к файлу" Binding="{Binding FilePath}" IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="Выберите папку с файлами" Command="{Binding OpenDirectoryCommand}"/>
+            <Button Grid.Column="1" Content="Выберите файлы" Command="{Binding OpenFilesCommand}"/>
+
+            <TextBlock Grid.ColumnSpan="2" Grid.Row="1" FontSize="35" Foreground="Green" TextAlignment="Center" TextWrapping="Wrap"
+                       Text="Перетащите на форму файлы или папки" />
+        </Grid>
+        <Button Grid.Row="4" Content="Подписать выбранные файлы" Command="{Binding SignCommand}" />
+
+        <Button Grid.Row="5" Content="Проверить подпись выбранных файлов" Command="{Binding VerefySignCommand}" />
+
+        
+
+       </Grid>
+</Window>

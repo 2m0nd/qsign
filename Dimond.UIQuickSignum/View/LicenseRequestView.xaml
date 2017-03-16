@@ -1,0 +1,62 @@
+﻿<Window x:Class="UIQuickSignum.View.LicenseRequestView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Лицензирование" SizeToContent="Height" Width="500" FontSize="12" ResizeMode="NoResize"
+        x:Name="_this"
+        DataContext="{Binding ElementName=_this, Path=ViewModel}"
+        >
+    <Window.Resources>
+        <Style
+    x:Key="LinkButton"
+    TargetType="Button">
+            <Setter
+        Property="Template">
+                <Setter.Value>
+                    <ControlTemplate
+                TargetType="Button">
+                        <TextBlock
+                    TextDecorations="Underline">
+                <ContentPresenter /></TextBlock>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter
+        Property="Foreground"
+        Value="Blue" />
+            <Style.Triggers>
+                <Trigger
+            Property="IsMouseOver"
+            Value="true">
+                    <Setter
+                Property="Foreground"
+                Value="Red" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock FontSize="16" Text="Серийный номер программного обеспечения:"/>
+        <TextBox IsReadOnly="True" Grid.Row="1" Height="150" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="{Binding SerialNumber, Mode=OneWay}"/>
+        <TextBlock  FontSize="16"  Grid.Row="2" Text="Введите ключ лицензии:"/>
+        <TextBox Grid.Row="3" Height="150" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="{Binding LicenseKey, Mode=TwoWay}"/>
+        <DockPanel Grid.Row="4" HorizontalAlignment="Stretch"  Margin="5" VerticalAlignment="Bottom">
+            
+            
+            <Button Cursor="Hand" FontSize="18" 
+                    Content="Приобрести лицензиию"
+                    Style="{StaticResource LinkButton}"
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Left"
+                    Command="{Binding BuyCommand}"/>
+            
+            <Button Content="Ok" Height="40" Width="100" HorizontalAlignment="Right" IsDefault="True" Command="{Binding CheckLicenseCommand}"/>
+        </DockPanel>
+    </Grid>
+</Window>
